@@ -2,11 +2,23 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
+import axios from 'axios';
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  componentDidMount() {
+    // react-native + expo do not recognize localhost
+    axios.get('http://192.168.86.194:3000/')
+    .then((response) => {
+      console.log('response from local server', response.data);
+    })
+    .catch((error) => {
+      console.error('error from local server', error);
+    });
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
