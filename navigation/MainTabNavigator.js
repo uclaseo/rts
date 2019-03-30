@@ -6,6 +6,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import LessonsScreen from '../screens/LessonsScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -53,8 +54,23 @@ SettingsStack.navigationOptions = {
   ),
 };
 
+const LessonsStack = createStackNavigator({
+  Lessons: LessonsScreen,
+});
+
+LessonsStack.navigationOptions = {
+  tabBarLabel: 'Lessons',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-calendar' : 'md-calendar'}
+    />
+  ),
+};
+
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
   SettingsStack,
+  LessonsStack,
 });
