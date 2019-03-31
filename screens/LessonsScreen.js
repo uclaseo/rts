@@ -6,8 +6,25 @@ import {
   Button,
   DatePickerAndroid,
   DatePickerIOS,
+  Text,
 } from 'react-native';
+
+import {
+  Tile,
+  Divider,
+  Overlay,
+} from 'react-native-elements';
+
 import { MonoText } from '../components/StyledText';
+
+const dummyUsers = [
+  { name: '제프', teachingDay: 'Thursday' },
+  { name: '상혁', teachingDay: 'Thursday' },
+  { name: '동균', teachingDay: 'Thursday' },
+  { name: '대로', teachingDay: 'Sunday' },
+  { name: '현수', teachingDay: 'Sunday' },
+  { name: '에디', teachingDay: 'Sunday' },
+];
 
 const styles = StyleSheet.create({
   container: {
@@ -25,57 +42,63 @@ export default class LessonsScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: null,
+      isOverlayVisible: false,
+      overlayContent: '',
     };
   }
 
-  openDatePicker = async () => {    
-    try {
-      const isAndroid = Platform.OS === 'android';
-      if (isAndroid) {
-        const {
-          action,
-          year,
-          month,
-          day,
-        } = await DatePickerAndroid.open({
-          date: new Date(),
-        });
-        if (action !== DatePickerAndroid.dismissedAction) {
-          console.log(year, month, day);
-          this.setState({
-            date: `${month + 1} ${day} ${year}`,
-          });
-        }
-      } else {
-        return (
-          <DatePickerIOS
-            date={new Date()}
-            onDateChange={this.setDate}
-          />
-        );
-      }
-    } catch ({code, message}) {
-      console.warn('Cannot open date picker', message);
-    }
+  handlePressThursday = (event) => {
+    console.log('handlePress Thursday', event);
+    this.setState({
+      isOverlayVisible: true,
+      overlayContent: 'Thursday',
+    });
   }
 
-  setDate = (date) => {
-    console.log('date', date);
+  handlePressSunday = (event) => {
+    console.log('handlePress Sunday');
+    this.setState({
+      isOverlayVisible: true,
+      overlayContent: 'Sunday',
+    });
   }
 
   render() {
     const {
-      date,
+      isOverlayVisible,
+      overlayContent,
     } = this.state;
     return (
       <ScrollView style={styles.container}>
-        <MonoText style={styles.codeHighlightText}>hi</MonoText>
-        <Button
-          onPress={this.openDatePicker}
-          title="datepicker"
+        <Tile
+          title="Thursday"
+          featured
+          // caption="제프, 상혁, 대로"
+          onPress={this.handlePressThursday}
         />
-        <MonoText style={styles.codeHighlightText}>{date}</MonoText>
+        <Divider style={{backgroundColor: 'blue'}} />
+        <Tile
+          title="Sunday"
+          featured
+          // caption="에디, 현수, 동균"
+          onPress={this.handlePressSunday}
+        />
+        <Overlay
+          isVisible={isOverlayVisible}
+          onBackdropPress={() => this.setState({ isOverlayVisible: false })}
+        >
+          <ScrollView>
+            {
+              dummyUsers.map((user) => {
+                if (user.teachingDay === overlayContent) {
+                  return (
+                    <Text key={user.name}>{user.name}</Text>
+                  );
+                }
+              })
+            }
+          </ScrollView>
+        </Overlay>
       </ScrollView>
     );
   }

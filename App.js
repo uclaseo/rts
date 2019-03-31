@@ -30,15 +30,15 @@ export default class App extends React.Component {
 
   componentDidMount() {
     // react-native + expo do not recognize localhost
-    const localAddress = 'http://192.168.86.194';
-    const localPort = '3000';
-    axios.get(`${localAddress}:${localPort}`)
-      .then((response) => {
-        console.log('response from local server', response.data);
-      })
-      .catch((error) => {
-        console.error('error from local server', error);
-      });
+  //   const localAddress = 'http://192.168.86.194';
+  //   const localPort = '3000';
+  //   axios.get(`${localAddress}:${localPort}`)
+  //     .then((response) => {
+  //       console.log('response from local server', response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('error from local server', error);
+  //     });
   }
 
   loadResourcesAsync = async () => Promise.all([
