@@ -1,29 +1,32 @@
 import React from 'react';
 import {
   Platform,
+  View,
   ScrollView,
   StyleSheet,
   Button,
   DatePickerAndroid,
   DatePickerIOS,
   Text,
+  FlatList,
 } from 'react-native';
 
 import {
   Tile,
   Divider,
   Overlay,
+  ListItem,
 } from 'react-native-elements';
 
 import { MonoText } from '../components/StyledText';
 
 const dummyUsers = [
-  { name: '제프', teachingDay: 'Thursday' },
-  { name: '상혁', teachingDay: 'Thursday' },
-  { name: '동균', teachingDay: 'Thursday' },
-  { name: '대로', teachingDay: 'Sunday' },
-  { name: '현수', teachingDay: 'Sunday' },
-  { name: '에디', teachingDay: 'Sunday' },
+  { name: '제프', teachingDay: 'Thursday', students: 3 },
+  { name: '상혁', teachingDay: 'Thursday', students: 4 },
+  { name: '동균', teachingDay: 'Thursday', students: 1 },
+  { name: '대로', teachingDay: 'Sunday', students: 0 },
+  { name: '현수', teachingDay: 'Sunday', students: 1 },
+  { name: '에디', teachingDay: 'Sunday', students: 3 },
 ];
 
 const styles = StyleSheet.create({
@@ -47,21 +50,36 @@ export default class LessonsScreen extends React.Component {
     };
   }
 
-  handlePressThursday = (event) => {
-    console.log('handlePress Thursday', event);
+  componentWillUnmount() {
     this.setState({
-      isOverlayVisible: true,
-      overlayContent: 'Thursday',
+      isOverlayVisible: false,
+      overlayContent: '',
     });
   }
 
-  handlePressSunday = (event) => {
-    console.log('handlePress Sunday');
+  handleOnPressLessonDay = (day) => {
+    console.log('handlePress day', day);
     this.setState({
       isOverlayVisible: true,
-      overlayContent: 'Sunday',
+      overlayContent: day,
     });
   }
+
+  handlePressCoach = (coachName) => {
+    console.log('coachName', coachName);
+  }
+
+  // keyExtractor = (item, index) => index.toString()
+
+  // renderItem = ({ item }) => {
+  //   return (
+  //     <ListItem
+  //       title={item.name}
+  //       subtitle={item.name}
+  //       // leftAvatar={{ source: { uri: item.avatar_url } }}
+  //     />
+  //   );
+  // }
 
   render() {
     const {
@@ -74,30 +92,45 @@ export default class LessonsScreen extends React.Component {
           title="Thursday"
           featured
           // caption="제프, 상혁, 대로"
-          onPress={this.handlePressThursday}
+          onPress={() => this.handleOnPressLessonDay('Thursday')}
         />
         <Divider style={{backgroundColor: 'blue'}} />
         <Tile
           title="Sunday"
           featured
           // caption="에디, 현수, 동균"
-          onPress={this.handlePressSunday}
+          onPress={() => this.handleOnPressLessonDay('Sunday')}
         />
         <Overlay
           isVisible={isOverlayVisible}
           onBackdropPress={() => this.setState({ isOverlayVisible: false })}
         >
-          <ScrollView>
+          <View>
+            {/* <FlatList
+              keyExtractor={this.keyExtractor}
+              data={dummyUsers}
+              renderItem={this.renderItem}
+            /> */}
             {
               dummyUsers.map((user) => {
                 if (user.teachingDay === overlayContent) {
                   return (
-                    <Text key={user.name}>{user.name}</Text>
+                    <ListItem
+                      key={user.name}
+                      // leftAvatar={{ source: { uri: l.avatar_url } }}
+                      title={user.name}
+                      subtitle={user.name}
+                      bottomDivider
+                      onPress={() => this.handlePressCoach(user.name)}
+                      badge={{
+                        value: user.students,
+                      }}
+                    />
                   );
                 }
               })
             }
-          </ScrollView>
+          </View>
         </Overlay>
       </ScrollView>
     );
