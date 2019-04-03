@@ -4,9 +4,11 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Button,
   Text,
   TouchableOpacity,
   View,
+  AsyncStorage,
 } from 'react-native';
 import {
   WebBrowser,
@@ -17,6 +19,16 @@ import { MonoText } from '../components/StyledText';
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
+  };
+
+  handleLearnMorePress = () => {
+    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
+  };
+
+  handleHelpPress = () => {
+    WebBrowser.openBrowserAsync(
+      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
+    );
   };
 
   maybeRenderDevelopmentModeWarning() {
@@ -42,15 +54,10 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
+  signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.props.navigation.navigate('Auth');
+  }
 
   render() {
     return (
@@ -93,6 +100,7 @@ export default class HomeScreen extends React.Component {
 
           <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
             <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
+            <Button title="SignOut" onPress={this.signOutAsync} />
           </View>
         </View>
       </View>
