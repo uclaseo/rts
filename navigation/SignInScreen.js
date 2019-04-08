@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { createStackNavigator } from 'react-navigation';
 import {
   View,
@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Facebook } from 'expo';
 import axios from 'axios';
+
 import config from '../config.json';
 
 const {
@@ -21,13 +22,9 @@ const {
 } = config;
 
 
-class SignInScreen extends React.Component {
+class SignInScreen extends Component {
   static navigationOptions = {
     title: 'Please sign in',
-  };
-
-  static state = {
-    isLoggedIn: false,
   };
 
   logIn = async () => {
@@ -43,19 +40,23 @@ class SignInScreen extends React.Component {
       });
       if (type === 'success') {
         const { name, email } = await this.fetchFacebookUser(token);
-        Alert.alert(`Hello ${name} ${email}!`);
-        this.saveTokenToAsyncStorage('userToken', token);
+        await AsyncStorage.setItem('userToken', token);
         const user = await this.fetchUser(email);
         if (user) {
-          console.log('user', user);
-          this.saveTokenToAsyncStorage('name', user.name);
-          this.saveTokenToAsyncStorage('email', user.email);
+          await AsyncStorage.setItem('user', JSON.stringify(user));
           return this.props.navigation.navigate('Main');
         }
+        AsyncStorage.setItem(
+          'user',
+          JSON.stringify({
+            name,
+            email,
+          }),
+        );
         return this.props.navigation.navigate('Role');
       }
     } catch (error) {
-      console.error('signIntoFaebook error: ', error);
+      return console.error('SignInScreen - signIntoFaebook error: ', error);
     }
   }
 
@@ -67,12 +68,8 @@ class SignInScreen extends React.Component {
         email,
       };
     } catch (error) {
-      console.error('fetchFacebookUser error: ', error);
+      console.error('SignInScreen - fetchFacebookUser error: ', error);
     }
-  }
-
-  saveTokenToAsyncStorage = async (key, value) => {
-    await AsyncStorage.setItem(key, value);
   }
 
   fetchUser = async (email) => {
