@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import { Facebook } from 'expo';
 import axios from 'axios';
+import config from '../config.json';
 
-const FACEBOOK_ID = '867376393605679';
+const FACEBOOK_ID = config.auth.facebookId;
 
 class SignInScreen extends React.Component {
   static navigationOptions = {
