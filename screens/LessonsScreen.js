@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   Platform,
   View,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class LessonsScreen extends React.Component {
+export default class LessonsScreen extends Component {
   static navigationOptions = {
     header: null,
   };

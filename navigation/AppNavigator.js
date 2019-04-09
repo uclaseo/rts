@@ -7,6 +7,8 @@ import MainTabNavigator from './MainTabNavigator';
 import SignInScreen from './SignInScreen';
 import AuthLoadingScreen from './AuthLoadingScreen';
 
+import RoleScreen from './RoleScreen';
+
 export default createAppContainer(createSwitchNavigator(
   {
     // You could add another route here for authentication.
@@ -14,6 +16,8 @@ export default createAppContainer(createSwitchNavigator(
     AuthLoading: AuthLoadingScreen,
     Auth: SignInScreen,
     Main: MainTabNavigator,
+
+    Role: RoleScreen,
   },
   {
     initialRouteName: 'AuthLoading',
