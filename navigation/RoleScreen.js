@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { createStackNavigator } from 'react-navigation';
-import axios from 'axios';
+import callApi from '../utils/Api';
 
 import {
   AsyncStorage,
@@ -69,7 +69,7 @@ class RoleScreen extends Component {
         },
       };
       await AsyncStorage.setItem('user', JSON.stringify(userWithRole));
-      await axios.post(`${ip}:${port}/user/`, userWithRole);
+      await callApi('post', `/user`, userWithRole);
       return this.props.navigation.navigate('Main');
     } catch (error) {
       console.error('RoleScreen - handleOnPressSave error: ', error);

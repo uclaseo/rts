@@ -13,7 +13,6 @@ import {
   Alert,
 } from 'react-native';
 
-
 import {
   Tile,
   Divider,
@@ -22,22 +21,13 @@ import {
   Card,
   Icon,
 } from 'react-native-elements';
+import axios from 'axios';
 
 import { MonoText } from '../components/StyledText';
 
 import callApi from '../utils/Api';
 
 import Colors from '../constants/Colors';
-
-
-const dummyUsers = [
-  { name: '제프', teachingDay: 'Thursday', students: 3 },
-  { name: '상혁', teachingDay: 'Thursday', students: 4 },
-  { name: '동균', teachingDay: 'Thursday', students: 1 },
-  { name: '대로', teachingDay: 'Thursday', students: 0 },
-  { name: '현수', teachingDay: 'Thursday', students: 1 },
-  { name: '에디', teachingDay: 'Thursday', students: 3 },
-];
 
 const styles = StyleSheet.create({
   container: {
@@ -66,6 +56,7 @@ export default class LessonsScreen extends Component {
     super(props);
     this.state = {
       user: {},
+      coaches: [],
       isOverlayVisible: false,
       overlayContent: '',
     };
@@ -73,6 +64,7 @@ export default class LessonsScreen extends Component {
 
   async componentDidMount() {
     try {
+      this.fetchCoaches();
       const user = JSON.parse(await AsyncStorage.getItem('user'));
       this.setState({
         user,
@@ -89,6 +81,21 @@ export default class LessonsScreen extends Component {
     });
   }
 
+  fetchCoaches = async () => {
+    try {
+      const response = await callApi('get', '/user/coach/getCoaches');
+      const { success, coaches } = response;
+      if (!success) {
+        // DO THE LOGIC IF NOT SUCCESS
+      }
+      this.setState({
+        coaches,
+      });
+    } catch (error) {
+      console.error('LessonsScreen - fetchCoaches error: ', error);
+    }
+  }
+
   handleOnPressLessonDay = (day) => {
     console.log('handlePress day', day);
     this.setState({
@@ -97,34 +104,65 @@ export default class LessonsScreen extends Component {
     });
   }
 
-  handlePressCoach = (coachName) => {
-    console.log('coachName', coachName);
-    this.joinLesson(coachName);
+  handlePressCoach = (coach) => {
+    this.joinLesson(coach);
   }
 
-  joinLesson = async (coachName) => {
+  joinLesson = async (coach) => {
     try {
-      const { user } = this.state;
-      if (!user.role.isMember) {
+      const { user, coaches } = this.state;
+      if (user.role.isMember) {
         const body = {
           user,
-          coachName,
+          coach,
         };
-        await callApi('post', '/lesson/join', body);
+        const response = await callApi('post', '/lesson/join', body);
+        const { success, coach: updatedCoach } = response;
+        if (!success) {
+          // DO THE LOGIC IF NOT SUCCESS
+        }
+        const index = coaches.findIndex((eachCoach) => {
+          return eachCoach.name === updatedCoach.name && eachCoach.email === updatedCoach.email;
+        });
+
+        this.setState((state) => {
+          const updatedCoaches = coaches.slice();
+          updatedCoaches[index] = updatedCoach;
+          return {
+            ...state,
+            coaches: updatedCoaches,
+          };
+        });
       } else {
         Alert.alert('Member only', 'You cannot join a lesson.');
       }
     } catch (error) {
       console.error('LessonsScreen - joinLesson error: ', error);
     }
+  }
 
+  renderCoaches = () => {
+    const { coaches } = this.state;
+    return coaches.map((coach) => {
+      return (
+        <ListItem
+          key={coach._id}
+          title={`${coach.name} ${coach.students}`}
+          onPress={() => this.handlePressCoach(coach)}
+        />
+      );
+    });
   }
 
   render() {
     const {
+      coaches,
       isOverlayVisible,
       overlayContent,
     } = this.state;
+
+    const hasCoaches = coaches.length > 0;
+
     return (
       <View
         style={styles.container}
@@ -168,29 +206,9 @@ export default class LessonsScreen extends Component {
           // fullScreen
         >
           <View>
-            {/* <FlatList
-              keyExtractor={this.keyExtractor}
-              data={dummyUsers}
-              renderItem={this.renderItem}
-            /> */}
             {
-              dummyUsers.map((user) => {
-                if (user.teachingDay === overlayContent) {
-                  return (
-                    <ListItem
-                      key={user.name}
-                      // leftAvatar={{ source: { uri: l.avatar_url } }}
-                      title={user.name}
-                      // subtitle={user.name}
-                      // bottomDivider
-                      onPress={() => this.handlePressCoach(user.name)}
-                      // badge={{
-                      //   value: user.students,
-                      // }}
-                    />
-                  );
-                }
-              })
+              hasCoaches
+              && this.renderCoaches()
             }
           </View>
         </Overlay>

@@ -74,7 +74,7 @@ class SignInScreen extends Component {
 
   fetchUser = async (email) => {
     const response = await axios.get(`${ip}:${port}/user/${email}`);
-    const user = response.data;
+    const user = response.data.user;
     return user;
   }
 

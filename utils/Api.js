@@ -11,7 +11,7 @@ const callApi = async (method, endPoint, body = null) => {
     const response = await axios[method](`${address}${endPoint}`, body);
     return response.data;
   } catch (error) {
-    console.error('callApi error: ', error);
+    return console.error('callApi error: ', error);
   }
 };
 
