@@ -9,7 +9,10 @@ import {
   DatePickerIOS,
   Text,
   FlatList,
+  AsyncStorage,
+  Alert,
 } from 'react-native';
+
 
 import {
   Tile,
@@ -21,6 +24,8 @@ import {
 } from 'react-native-elements';
 
 import { MonoText } from '../components/StyledText';
+
+import callApi from '../utils/Api';
 
 import Colors from '../constants/Colors';
 
@@ -60,9 +65,21 @@ export default class LessonsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: {},
       isOverlayVisible: false,
       overlayContent: '',
     };
+  }
+
+  async componentDidMount() {
+    try {
+      const user = JSON.parse(await AsyncStorage.getItem('user'));
+      this.setState({
+        user,
+      });
+    } catch (error) {
+      console.error('LessonsScreen - componentDidMount error: ', error);
+    }
   }
 
   componentWillUnmount() {
@@ -82,6 +99,25 @@ export default class LessonsScreen extends Component {
 
   handlePressCoach = (coachName) => {
     console.log('coachName', coachName);
+    this.joinLesson(coachName);
+  }
+
+  joinLesson = async (coachName) => {
+    try {
+      const { user } = this.state;
+      if (!user.role.isMember) {
+        const body = {
+          user,
+          coachName,
+        };
+        await callApi('post', '/lesson/join', body);
+      } else {
+        Alert.alert('Member only', 'You cannot join a lesson.');
+      }
+    } catch (error) {
+      console.error('LessonsScreen - joinLesson error: ', error);
+    }
+
   }
 
   render() {
@@ -148,9 +184,9 @@ export default class LessonsScreen extends Component {
                       // subtitle={user.name}
                       // bottomDivider
                       onPress={() => this.handlePressCoach(user.name)}
-                      badge={{
-                        value: user.students,
-                      }}
+                      // badge={{
+                      //   value: user.students,
+                      // }}
                     />
                   );
                 }
