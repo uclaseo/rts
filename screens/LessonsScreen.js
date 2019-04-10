@@ -71,7 +71,7 @@ export default class LessonsScreen extends Component {
         coaches,
       });
     } catch (error) {
-      console.error('LessonsScreen - componentDidMount error: ', error);
+      return console.error('LessonsScreen - componentDidMount error: ', error);
     }
   }
 
@@ -91,7 +91,7 @@ export default class LessonsScreen extends Component {
       }
       return coaches;
     } catch (error) {
-      console.error('LessonsScreen - fetchCoaches error: ', error);
+      return console.error('LessonsScreen - fetchCoaches error: ', error);
     }
   }
 
@@ -119,8 +119,7 @@ export default class LessonsScreen extends Component {
           coach,
         };
         const response = await callApi('post', '/lesson/join', body);
-        const { success, coach: updatedCoach } = response;
-        console.log('response', response);
+        const { success, user: updatedUser, coach: updatedCoach } = response;
         if (!success) {
           // DO THE LOGIC IF NOT SUCCESS
           return Alert.alert(response.message);
@@ -132,16 +131,26 @@ export default class LessonsScreen extends Component {
         this.setState((state) => {
           const updatedCoaches = coaches.slice();
           updatedCoaches[index] = updatedCoach;
+          console.log('updatedUser', updatedUser);
           return {
             ...state,
+            user: updatedUser,
             coaches: updatedCoaches,
           };
+        }, async () => {
+          try {
+            console.log('user 1', await AsyncStorage.getItem('user'));
+            await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            console.log('user 2', await AsyncStorage.getItem('user'));
+          } catch (error) {
+            console.log('error', error);
+          }
         });
       } else {
         Alert.alert('Member only', 'You cannot join a lesson.');
       }
     } catch (error) {
-      console.error('LessonsScreen - joinLesson error: ', error);
+      return console.error('LessonsScreen - joinLesson error: ', error);
     }
   }
 

@@ -80,10 +80,10 @@ class RoleScreen extends Component {
         };
       }
       await AsyncStorage.setItem('user', JSON.stringify(userWithRole));
-      await callApi('post', '/user', userWithRole);
+      await callApi('post', '/user/create', { user: userWithRole });
       return this.props.navigation.navigate('Main');
     } catch (error) {
-      console.error('RoleScreen - handleOnPressSave error: ', error);
+      return console.error('RoleScreen - handleOnPressSave error: ', error);
     }
   }
 

@@ -17,10 +17,6 @@ const {
   auth: {
     facebookId: FACEBOOK_ID,
   },
-  api: {
-    ip,
-    port,
-  },
 } = config;
 
 
@@ -31,58 +27,58 @@ class SignInScreen extends Component {
 
   logIn = async () => {
     try {
-      // const {
-      //   type,
-      //   token,
-      //   expires,
-      //   permissions,
-      //   declinedPermissions,
-      // } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_ID, {
-      //   permissions: ['public_profile', 'email'],
-      // });
-      // if (type === 'success') {
-      //   const { name, email } = await this.fetchFacebookUser(token);
-      //   await AsyncStorage.setItem('userToken', token);
-      //   const user = await this.fetchUser(email);
-      //   if (user) {
-      //     await AsyncStorage.setItem('user', JSON.stringify(user));
-      //     return this.props.navigation.navigate('Main');
-      //   }
-      //   AsyncStorage.setItem(
-      //     'user',
-      //     JSON.stringify({
-      //       name,
-      //       email,
-      //     }),
-      //   );
-      //   return this.props.navigation.navigate('Role');
-      // }
+      const {
+        type,
+        token,
+        expires,
+        permissions,
+        declinedPermissions,
+      } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_ID, {
+        permissions: ['public_profile', 'email'],
+      });
+      if (type === 'success') {
+        const { name, email } = await this.fetchFacebookUser(token);
+        await AsyncStorage.setItem('userToken', token);
+        const user = await this.fetchUser(email);
+        if (user) {
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+          return this.props.navigation.navigate('Main');
+        }
+        AsyncStorage.setItem(
+          'user',
+          JSON.stringify({
+            name,
+            email,
+          }),
+        );
+        return this.props.navigation.navigate('Role');
+      }
 
 
-      const _id = '5cabdbcf2649920bb1a828e5';
-      const name = 'Inseok Seo';
-      const email = 'illhvhlda@hotmail.com';
-      const role = {
-        isMember: true,
-        isCoach: false,
-      };
-      const coach = {
-        coach: {},
-        isRegistered: true,
-      };
-      const user = {
-        _id,
-        name,
-        email,
-        role,
-        coach,
-      };
-      await AsyncStorage.setItem('user', JSON.stringify(user));
-      return this.props.navigation.navigate('Main');
+      // const _id = '5cabdbcf2649920bb1a828e5';
+      // const name = 'Inseok Seo';
+      // const email = 'illhvhlda@hotmail.com';
+      // const role = {
+      //   isMember: true,
+      //   isCoach: false,
+      // };
+      // const coach = {
+      //   coach: {},
+      //   isRegistered: true,
+      // };
+      // const user = {
+      //   _id,
+      //   name,
+      //   email,
+      //   role,
+      //   coach,
+      // };
+      // await AsyncStorage.setItem('user', JSON.stringify(user));
+      // return this.props.navigation.navigate('Main');
 
 
     } catch (error) {
-      return console.error('SignInScreen - signIntoFaebook error: ', error);
+      return console.error('SignInScreen - login error: ', error);
     }
   }
 
@@ -94,13 +90,13 @@ class SignInScreen extends Component {
         email,
       };
     } catch (error) {
-      console.error('SignInScreen - fetchFacebookUser error: ', error);
+      return console.error('SignInScreen - fetchFacebookUser error: ', error);
     }
   }
 
   fetchUser = async (email) => {
     const response = await apiCaller('get', `/user/${email}`);
-    const { user } = response.data.user;
+    const { user } = response;
     return user;
   }
 
