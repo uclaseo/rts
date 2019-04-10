@@ -9,15 +9,13 @@ import {
 import { Facebook } from 'expo';
 import axios from 'axios';
 
+import apiCaller from '../utils/Api';
+
 import config from '../config.json';
 
 const {
   auth: {
     facebookId: FACEBOOK_ID,
-  },
-  api: {
-    ip,
-    port,
   },
 } = config;
 
@@ -55,26 +53,50 @@ class SignInScreen extends Component {
         );
         return this.props.navigation.navigate('Role');
       }
+
+
+      // const _id = '5cabdbcf2649920bb1a828e5';
+      // const name = 'Inseok Seo';
+      // const email = 'illhvhlda@hotmail.com';
+      // const role = {
+      //   isMember: true,
+      //   isCoach: false,
+      // };
+      // const coach = {
+      //   coach: {},
+      //   isRegistered: true,
+      // };
+      // const user = {
+      //   _id,
+      //   name,
+      //   email,
+      //   role,
+      //   coach,
+      // };
+      // await AsyncStorage.setItem('user', JSON.stringify(user));
+      // return this.props.navigation.navigate('Main');
+
+
     } catch (error) {
-      return console.error('SignInScreen - signIntoFaebook error: ', error);
+      return console.error('SignInScreen - login error: ', error);
     }
   }
 
   fetchFacebookUser = async (token) => {
     try {
-      const { data: { name, email } } = await axios(`https://graph.facebook.com/me?fields=id,name,email&access_token=${token}`);
+      const { data: { name, email } } = await axios.get(`https://graph.facebook.com/me?fields=id,name,email&access_token=${token}`);
       return {
         name,
         email,
       };
     } catch (error) {
-      console.error('SignInScreen - fetchFacebookUser error: ', error);
+      return console.error('SignInScreen - fetchFacebookUser error: ', error);
     }
   }
 
   fetchUser = async (email) => {
-    const response = await axios.get(`${ip}:${port}/user/${email}`);
-    const user = response.data;
+    const response = await apiCaller('get', `/user/${email}`);
+    const { user } = response;
     return user;
   }
 

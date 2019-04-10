@@ -9,6 +9,8 @@ import {
   DatePickerIOS,
   Text,
   FlatList,
+  AsyncStorage,
+  Alert,
 } from 'react-native';
 
 import {
@@ -16,24 +18,32 @@ import {
   Divider,
   Overlay,
   ListItem,
+  Card,
+  Icon,
 } from 'react-native-elements';
+import axios from 'axios';
 
 import { MonoText } from '../components/StyledText';
 
-const dummyUsers = [
-  { name: '제프', teachingDay: 'Thursday', students: 3 },
-  { name: '상혁', teachingDay: 'Thursday', students: 4 },
-  { name: '동균', teachingDay: 'Thursday', students: 1 },
-  { name: '대로', teachingDay: 'Sunday', students: 0 },
-  { name: '현수', teachingDay: 'Sunday', students: 1 },
-  { name: '에디', teachingDay: 'Sunday', students: 3 },
-];
+import callApi from '../utils/Api';
+
+import Colors from '../constants/Colors';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
+  },
+  tileContainer: {
+    flex: 1,
+  },
+  title: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  text: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });
 
@@ -45,9 +55,24 @@ export default class LessonsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: {},
+      coaches: [],
       isOverlayVisible: false,
       overlayContent: '',
     };
+  }
+
+  async componentDidMount() {
+    try {
+      const coaches = await this.fetchCoaches();
+      const user = JSON.parse(await AsyncStorage.getItem('user'));
+      this.setState({
+        user,
+        coaches,
+      });
+    } catch (error) {
+      return console.error('LessonsScreen - componentDidMount error: ', error);
+    }
   }
 
   componentWillUnmount() {
@@ -55,6 +80,19 @@ export default class LessonsScreen extends Component {
       isOverlayVisible: false,
       overlayContent: '',
     });
+  }
+
+  fetchCoaches = async () => {
+    try {
+      const response = await callApi('get', '/user/coach/getCoaches');
+      const { success, coaches } = response;
+      if (!success) {
+        // DO THE LOGIC IF NOT SUCCESS
+      }
+      return coaches;
+    } catch (error) {
+      return console.error('LessonsScreen - fetchCoaches error: ', error);
+    }
   }
 
   handleOnPressLessonDay = (day) => {
@@ -65,74 +103,129 @@ export default class LessonsScreen extends Component {
     });
   }
 
-  handlePressCoach = (coachName) => {
-    console.log('coachName', coachName);
+  handlePressCoach = (coach) => {
+    this.joinLesson(coach);
   }
 
-  // keyExtractor = (item, index) => index.toString()
+  joinLesson = async (coach) => {
+    try {
+      const { user, coaches } = this.state;
+      if (user.role.isMember) {
+        if (user.coach.isRegistered) {
+          return Alert.alert('You already have a coach');
+        }
+        const body = {
+          user,
+          coach,
+        };
+        const response = await callApi('post', '/lesson/join', body);
+        const { success, user: updatedUser, coach: updatedCoach } = response;
+        if (!success) {
+          // DO THE LOGIC IF NOT SUCCESS
+          return Alert.alert(response.message);
+        }
+        const index = coaches.findIndex((eachCoach) => {
+          return eachCoach.name === updatedCoach.name && eachCoach.email === updatedCoach.email;
+        });
 
-  // renderItem = ({ item }) => {
-  //   return (
-  //     <ListItem
-  //       title={item.name}
-  //       subtitle={item.name}
-  //       // leftAvatar={{ source: { uri: item.avatar_url } }}
-  //     />
-  //   );
-  // }
+        this.setState((state) => {
+          const updatedCoaches = coaches.slice();
+          updatedCoaches[index] = updatedCoach;
+          console.log('updatedUser', updatedUser);
+          return {
+            ...state,
+            user: updatedUser,
+            coaches: updatedCoaches,
+          };
+        }, async () => {
+          try {
+            console.log('user 1', await AsyncStorage.getItem('user'));
+            await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            console.log('user 2', await AsyncStorage.getItem('user'));
+          } catch (error) {
+            console.log('error', error);
+          }
+        });
+      } else {
+        Alert.alert('Member only', 'You cannot join a lesson.');
+      }
+    } catch (error) {
+      return console.error('LessonsScreen - joinLesson error: ', error);
+    }
+  }
+
+  renderCoaches = () => {
+    const { coaches } = this.state;
+    return coaches.map((coach) => {
+      return (
+        <ListItem
+          key={coach._id}
+          title={`${coach.name} ${coach.students.count}`}
+          onPress={() => this.handlePressCoach(coach)}
+        />
+      );
+    });
+  }
 
   render() {
     const {
+      coaches,
       isOverlayVisible,
       overlayContent,
     } = this.state;
+
+    const hasCoaches = coaches.length > 0;
+
     return (
-      <ScrollView style={styles.container}>
-        <Tile
-          title="Thursday"
-          featured
-          // caption="제프, 상혁, 대로"
-          onPress={() => this.handleOnPressLessonDay('Thursday')}
-        />
-        <Divider style={{backgroundColor: 'blue'}} />
-        <Tile
-          title="Sunday"
-          featured
-          // caption="에디, 현수, 동균"
-          onPress={() => this.handleOnPressLessonDay('Sunday')}
-        />
+      <View
+        style={styles.container}
+      >
+        <View
+          style={{
+            ...styles.tileContainer,
+            backgroundColor: Colors.primaryColor,
+          }}
+        >
+          <Tile
+            title="Thursday"
+            onPress={() => this.handleOnPressLessonDay('Thursday')}
+            titleStyle={styles.title}
+            contentContainerStyle={{
+              height: 500,
+            }}
+          />
+        </View>
+        <Divider style={{ backgroundColor: 'blue' }} />
+        <View
+          style={{
+            ...styles.tileContainer,
+            backgroundColor: Colors.secondaryColor,
+          }}
+        >
+          <Tile
+            title="Sunday"
+            onPress={() => this.handleOnPressLessonDay('Sunday')}
+            titleStyle={styles.title}
+            contentContainerStyle={{
+              height: 500,
+            }}
+          />
+        </View>
+
         <Overlay
           isVisible={isOverlayVisible}
           onBackdropPress={() => this.setState({ isOverlayVisible: false })}
+          borderRadius={25}
+          // fullScreen
         >
           <View>
-            {/* <FlatList
-              keyExtractor={this.keyExtractor}
-              data={dummyUsers}
-              renderItem={this.renderItem}
-            /> */}
             {
-              dummyUsers.map((user) => {
-                if (user.teachingDay === overlayContent) {
-                  return (
-                    <ListItem
-                      key={user.name}
-                      // leftAvatar={{ source: { uri: l.avatar_url } }}
-                      title={user.name}
-                      subtitle={user.name}
-                      bottomDivider
-                      onPress={() => this.handlePressCoach(user.name)}
-                      badge={{
-                        value: user.students,
-                      }}
-                    />
-                  );
-                }
-              })
+              hasCoaches
+              && this.renderCoaches()
             }
           </View>
         </Overlay>
-      </ScrollView>
+      </View>
     );
   }
 }

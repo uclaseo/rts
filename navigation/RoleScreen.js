@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { createStackNavigator } from 'react-navigation';
-import axios from 'axios';
+import callApi from '../utils/Api';
 
 import {
   AsyncStorage,
@@ -60,7 +60,7 @@ class RoleScreen extends Component {
         isMemberChecked: isMember,
         isCoachChecked: isCoach,
       } = this.state;
-  
+
       const userWithRole = {
         ...user,
         role: {
@@ -68,11 +68,22 @@ class RoleScreen extends Component {
           isCoach,
         },
       };
+      if (isMember) {
+        userWithRole.coach = {
+          coach: {},
+          isRegistered: false,
+        };
+      } else if (isCoach) {
+        userWithRole.students = {
+          list: [],
+          count: 0,
+        };
+      }
       await AsyncStorage.setItem('user', JSON.stringify(userWithRole));
-      await axios.post(`${ip}:${port}/user/`, userWithRole);
+      await callApi('post', '/user/create', { user: userWithRole });
       return this.props.navigation.navigate('Main');
     } catch (error) {
-      console.error('RoleScreen - handleOnPressSave error: ', error);
+      return console.error('RoleScreen - handleOnPressSave error: ', error);
     }
   }
 

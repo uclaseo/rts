@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import LessonsScreen from '../screens/LessonsScreen';
+import { withTheme } from 'react-native-elements';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -85,5 +86,12 @@ export default createMaterialTopTabNavigator(
   {
     tabBarPosition: 'bottom',
     swipeEnabled: true,
+    tabBarOptions: {
+      showIcon: true,
+      showLabel: false,
+      style: {
+        backgroundColor: 'white',
+      },
+    },
   },
 );
