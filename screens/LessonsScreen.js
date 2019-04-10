@@ -64,10 +64,11 @@ export default class LessonsScreen extends Component {
 
   async componentDidMount() {
     try {
-      this.fetchCoaches();
+      const coaches = await this.fetchCoaches();
       const user = JSON.parse(await AsyncStorage.getItem('user'));
       this.setState({
         user,
+        coaches,
       });
     } catch (error) {
       console.error('LessonsScreen - componentDidMount error: ', error);
@@ -88,9 +89,7 @@ export default class LessonsScreen extends Component {
       if (!success) {
         // DO THE LOGIC IF NOT SUCCESS
       }
-      this.setState({
-        coaches,
-      });
+      return coaches;
     } catch (error) {
       console.error('LessonsScreen - fetchCoaches error: ', error);
     }
@@ -112,14 +111,19 @@ export default class LessonsScreen extends Component {
     try {
       const { user, coaches } = this.state;
       if (user.role.isMember) {
+        if (user.coach.isRegistered) {
+          return Alert.alert('You already have a coach');
+        }
         const body = {
           user,
           coach,
         };
         const response = await callApi('post', '/lesson/join', body);
         const { success, coach: updatedCoach } = response;
+        console.log('response', response);
         if (!success) {
           // DO THE LOGIC IF NOT SUCCESS
+          return Alert.alert(response.message);
         }
         const index = coaches.findIndex((eachCoach) => {
           return eachCoach.name === updatedCoach.name && eachCoach.email === updatedCoach.email;
@@ -147,7 +151,7 @@ export default class LessonsScreen extends Component {
       return (
         <ListItem
           key={coach._id}
-          title={`${coach.name} ${coach.students}`}
+          title={`${coach.name} ${coach.students.count}`}
           onPress={() => this.handlePressCoach(coach)}
         />
       );

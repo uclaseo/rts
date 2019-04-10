@@ -60,7 +60,7 @@ class RoleScreen extends Component {
         isMemberChecked: isMember,
         isCoachChecked: isCoach,
       } = this.state;
-  
+
       const userWithRole = {
         ...user,
         role: {
@@ -68,8 +68,19 @@ class RoleScreen extends Component {
           isCoach,
         },
       };
+      if (isMember) {
+        userWithRole.coach = {
+          coach: {},
+          isRegistered: false,
+        };
+      } else if (isCoach) {
+        userWithRole.students = {
+          list: [],
+          count: 0,
+        };
+      }
       await AsyncStorage.setItem('user', JSON.stringify(userWithRole));
-      await callApi('post', `/user`, userWithRole);
+      await callApi('post', '/user', userWithRole);
       return this.props.navigation.navigate('Main');
     } catch (error) {
       console.error('RoleScreen - handleOnPressSave error: ', error);
