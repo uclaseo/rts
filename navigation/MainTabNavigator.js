@@ -9,6 +9,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 import LessonsScreen from '../screens/LessonsScreen';
 import { withTheme } from 'react-native-elements';
 
+import Colors from '../constants/Colors';
+
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
 });
@@ -89,6 +91,9 @@ export default createMaterialTopTabNavigator(
     tabBarOptions: {
       showIcon: true,
       showLabel: false,
+      indicatorStyle: {
+        backgroundColor: Colors.tintColor,
+      },
       style: {
         backgroundColor: 'white',
       },
