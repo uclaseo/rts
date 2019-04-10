@@ -166,20 +166,20 @@ export default class HomeScreen extends React.Component {
           <View style={styles.getStartedContainer}>
             {this.maybeRenderDevelopmentModeWarning()}
 
-            <Text style={styles.getStartedText}>Get started by opening</Text>
+            <MonoText style={styles.getStartedText}>Get started by opening</MonoText>
 
             <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
               <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
             </View>
 
-            <Text style={styles.getStartedText}>
+            <MonoText style={styles.getStartedText}>
               Change this text and your app will automatically reload.
-            </Text>
+            </MonoText>
           </View>
 
           <View style={styles.helpContainer}>
             <TouchableOpacity onPress={this.handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
+              <MonoText style={styles.helpLinkText}>Help, it didn’t automatically reload!</MonoText>
             </TouchableOpacity>
           </View>
         </ScrollView>
