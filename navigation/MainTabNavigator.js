@@ -2,10 +2,15 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
+
+import { Icon } from 'expo';
+
+
+
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import VotesScreen from '../screens/VotesScreen';
 import LessonsScreen from '../screens/LessonsScreen';
 import { withTheme } from 'react-native-elements';
 
@@ -43,16 +48,22 @@ LinksStack.navigationOptions = {
   ),
 };
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
+const VotesStack = createStackNavigator({
+  Votes: VotesScreen,
 });
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+VotesStack.navigationOptions = {
+  tabBarLabel: 'Votes', 
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    // <TabBarIcon
+    //   focused={focused}
+    //   name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    // />
+    <Icon.MaterialCommunityIcons
+      name="vote"
+      size={26}
+      style={{ marginBottom: -3 }}
+      color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
     />
   ),
 };
@@ -75,7 +86,7 @@ export default createMaterialTopTabNavigator(
   {
     HomeStack,
     LinksStack,
-    SettingsStack,
+    VotesStack,
     LessonsStack,
   },
   {

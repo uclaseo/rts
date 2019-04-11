@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 
 export default class LessonsScreen extends Component {
   static navigationOptions = {
-    header: null,
+    title: 'lessons',
   };
 
   constructor(props) {
@@ -63,6 +63,25 @@ export default class LessonsScreen extends Component {
   }
 
   async componentDidMount() {
+    console.log('componentDidMount')
+
+    // const didBlurSubscription = this.props.navigation.addListener(
+    //   'didBlur',
+    //   payload => {
+    //     console.log('didBlur', payload);
+    //   }
+    // )
+
+    // const didFocusSubscription = this.props.navigation.addListener(
+    //   'didFocus',
+    //   payload => {
+    //     console.log('didFocus', payload);
+    //   }
+    // )
+
+
+
+
     try {
       const coaches = await this.fetchCoaches();
       const user = JSON.parse(await AsyncStorage.getItem('user'));
@@ -76,6 +95,13 @@ export default class LessonsScreen extends Component {
   }
 
   componentWillUnmount() {
+
+
+
+
+
+
+    console.log('componentwillunmount');
     this.setState({
       isOverlayVisible: false,
       overlayContent: '',
