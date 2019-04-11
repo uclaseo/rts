@@ -14,8 +14,8 @@ const StyledButton = (props) => {
   return (
     <View
       style={{
-        borderRadius: 50,
         width: 150,
+        borderRadius: 50,
         overflow: 'hidden',
       }}
     >

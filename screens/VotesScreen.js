@@ -5,8 +5,9 @@ import {
   View,
   Text,
   FlatList,
-  SectionList,
-  TouchableOpacity,
+  Modal,
+  TouchableHighlight,
+  Alert,
 } from 'react-native';
 
 import {
@@ -38,6 +39,7 @@ export default class VotesScreen extends Component {
   state = {
     openVotes: [],
     closedVotes: [],
+    isModalOpen: false,
   };
 
   async componentDidMount() {
@@ -106,6 +108,10 @@ export default class VotesScreen extends Component {
     );
   }
 
+  toggleModal = () => {
+    this.setState({ isModalOpen: !this.state.isModalOpen });
+  }
+
   render() {
     const {
       openVotes,
@@ -138,12 +144,63 @@ export default class VotesScreen extends Component {
           }
         </View>
         <View
-          style={styles.contentContainer}
-        > 
-          <StyledButton
-            onPress={this.handleOnPress}
-            title="CREATE VOTE"
-          />
+          style={{
+            ...styles.contentContainer,
+            flexDirection: 'row',
+            // justifyContent: 'stretch',
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: 30,
+            }}
+          >
+            <StyledButton
+              onPress={this.handleOnPress}
+              title="+"
+
+            />
+          </View>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              paddingBottom: 30,
+            }}
+          >
+            <StyledButton
+              onPress={this.toggleModal}
+              title="open modal"
+            />
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={this.state.isModalOpen}
+              onRequestClose={() => {
+                Alert.alert('Modal has been closed.');
+              }}
+              // presentationStyle="overFullScreen "
+            >
+              <View style={{marginTop: 22}}>
+                <View>
+                  <Text>Hello World!</Text>
+
+                  <TouchableHighlight
+                    onPress={() => {
+                      this.toggleModal(!this.state.isModalOpen);
+                    }}>
+                    <Text>Hide Modal</Text>
+                  </TouchableHighlight>
+                </View>
+              </View>
+            </Modal>
+
+
+          </View>
         </View>
       </View>
     );
