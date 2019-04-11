@@ -6,14 +6,18 @@ import {
   Text,
   FlatList,
   SectionList,
+  TouchableOpacity,
 } from 'react-native';
 
+import {
+  Button,
+} from 'react-native-elements';
+
+import StyledButton from '../components/StyledButton';
 import callApi from '../utils/Api';
 
 import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors';
-import axios from 'axios';
-
 
 const styles = StyleSheet.create({
   container: {
@@ -53,6 +57,16 @@ export default class VotesScreen extends Component {
     return callApi('get', '/vote/closedVotes');
   }
 
+  handleOnPress = async () => {
+    const voteOption = {
+      title: 'First Vote',
+      text: 'this is the first vote',
+      isOpen: true,
+    };
+    const response = await callApi('post', '/vote/create', voteOption);
+    console.log('response', response);
+  }
+
   render() {
     return (
       <View
@@ -68,7 +82,11 @@ export default class VotesScreen extends Component {
         </View>
         <View
           style={styles.contentContainer}
-        >
+        > 
+          <StyledButton
+            onPress={this.handleOnPress}
+            title="CREATE VOTE"
+          />
         </View>
       </View>
     );
