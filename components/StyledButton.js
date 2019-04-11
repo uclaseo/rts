@@ -36,7 +36,7 @@ const StyledButton = (props) => {
         {...props}
         background={
           Platform.OS !== 'ios' ?
-          TouchableNativeFeedback.Ripple('red', false) :
+          TouchableNativeFeedback.Ripple(Colors.secondaryColor, false) :
           undefined
         }
       />
