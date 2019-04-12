@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  StyleSheet,
   View,
   Platform,
   TouchableNativeFeedback,
@@ -8,7 +9,6 @@ import {
 import { Button } from 'react-native-elements';
 
 import Colors from '../constants/Colors';
-
 
 export const StyledButton = (props) => {
   return (
@@ -45,14 +45,20 @@ export const StyledButton = (props) => {
 };
 
 export const CircleButton = (props) => {
-  const size = props.size ? props.size : 40;
+  const size = props.size ? props.size : 60;
   return (
     <View
       style={{
+        position: 'absolute',
         width: size,
         height: size,
         borderRadius: size / 2,
         overflow: 'hidden',
+        bottom: 20,
+        right: 20,
+        shadowOffset: { width: 10, height: 10, },
+        shadowColor: 'black',
+        shadowOpacity: 1.0,
       }}
     >
       <Button
@@ -70,6 +76,7 @@ export const CircleButton = (props) => {
           color: Colors.tintColor,
         }}
         type="outline"
+        raised
         {...props}
         background={
         Platform.OS !== 'ios'
