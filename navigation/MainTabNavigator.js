@@ -60,7 +60,7 @@ VotesStack.navigationOptions = {
     //   name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
     // />
     <Icon.MaterialCommunityIcons
-      name="vote"
+      name="vote-outline"
       size={26}
       style={{ marginBottom: -3 }}
       color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}

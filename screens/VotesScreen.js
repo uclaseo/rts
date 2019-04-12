@@ -11,7 +11,12 @@ import {
 } from 'react-native';
 
 import {
+  Icon,
+} from 'expo';
+
+import {
   Button,
+  Badge,
 } from 'react-native-elements';
 
 import { 
@@ -106,6 +111,7 @@ export default class VotesScreen extends Component {
   }
 
   renderOpenVotes = (openVotes) => {
+
     return (
       <FlatList
         data={openVotes}
@@ -132,7 +138,16 @@ export default class VotesScreen extends Component {
                   alignItems: 'center',
                 }}
               >
-                <Text>dd</Text>
+                <Icon.MaterialCommunityIcons
+                  name="vote-outline"
+                  size={26}
+                  style={{ marginBottom: -3 }}
+                  color={Colors.tabIconDefault}
+                />
+                <Badge
+                  value="30"
+                  status="success"
+                />
               </View>
 
 
