@@ -10,7 +10,7 @@ import { Button } from 'react-native-elements';
 import Colors from '../constants/Colors';
 
 
-const StyledButton = (props) => {
+export const StyledButton = (props) => {
   return (
     <View
       style={{
@@ -35,13 +35,48 @@ const StyledButton = (props) => {
         type="outline"
         {...props}
         background={
-          Platform.OS !== 'ios' ?
-          TouchableNativeFeedback.Ripple(Colors.secondaryColor, false) :
-          undefined
+        Platform.OS !== 'ios'
+          ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
+          : undefined
         }
       />
     </View>
   );
 };
 
-export default StyledButton;
+export const CircleButton = (props) => {
+  const size = props.size ? props.size : 40;
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        overflow: 'hidden',
+      }}
+    >
+      <Button
+        buttonStyle={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+        }}
+        containaerStyle={{
+        }}
+        titleStyle={{
+          fontSize: 14,
+          fontWeight: '500',
+          fontFamily: 'roboto',
+          color: Colors.tintColor,
+        }}
+        type="outline"
+        {...props}
+        background={
+        Platform.OS !== 'ios'
+          ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
+          : undefined
+        }
+      />
+    </View>
+  );
+};

@@ -20,8 +20,7 @@
     ],
     "rules": {
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-        "no-console": 0,
-        "arrow-body-style": ["always"]
+        "no-console": 0
     },
     "parser": "babel-eslint"
 }

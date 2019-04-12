@@ -14,7 +14,10 @@ import {
   Button,
 } from 'react-native-elements';
 
-import StyledButton from '../components/StyledButton';
+import { 
+  StyledButton,
+  CircleButton,
+} from '../components/StyledButton';
 import callApi from '../utils/Api';
 
 import { MonoText } from '../components/StyledText';
@@ -43,22 +46,20 @@ export default class VotesScreen extends Component {
   };
 
   async componentDidMount() {
-    const allVotes = await this.fetchAllVotes();
+    await this.fetchAllVotes();
+  }
+
+  fetchAllVotes = async () => {
+    const allVotes = await Promise.all([
+      this.fetchOpenVotes(),
+      this.fetchClosedVotes(),
+    ]);
     const openVotes = allVotes[0];
     const closedVotes = allVotes[1];
     this.setState({
       openVotes,
       closedVotes,
-    })
-  }
-
-  fetchAllVotes = async () => {
-    const openVotes = this.fetchOpenVotes();
-    const closedVotes = this.fetchClosedVotes();
-    return Promise.all([
-      openVotes,
-      closedVotes,
-    ]);
+    });
   }
 
   fetchOpenVotes = async () => {
@@ -80,20 +81,148 @@ export default class VotesScreen extends Component {
   }
 
   handleOnPress = async () => {
-    const voteOption = {
-      title: 'First Vote',
-      text: 'this is the first vote',
-      isOpen: true,
-    };
-    const response = await callApi('post', '/vote/create', voteOption);
+    try {
+      const voteOption = {
+        id: 1,
+        title: 'First Vote',
+        text: 'this is the first vote',
+        options: [
+          { message: 'yes', count: 0 },
+          { message: 'no', count: 0 },
+          { message: 'I dont know', count: 0 },
+        ],
+        isOpen: true,
+      };
+      const { success } = await callApi('post', '/vote/create', voteOption);
+      if (!success) {
+        // DO SOME LOGIC HERE
+      }
+      await this.fetchAllVotes();
+
+    } catch (error) {
+      return console.error('VotesScreen - handleOnPress error: ', error);
+    }
+
   }
 
   renderOpenVotes = (openVotes) => {
     return (
       <FlatList
         data={openVotes}
-        keyExtractor={(vote) => vote._id}
-        renderItem={({ item }) => <Text>{item.title}</Text>}
+        keyExtractor={vote => vote._id}
+        renderItem={({ item }) => {
+          console.log('item', item);
+          return (
+            <View
+              style={{
+                height: 60,
+                backgroundColor: 'yellow',  // EACH LIST ITEM CONTAINER
+                flexDirection: 'row',
+                marginTop: 7,
+                marginBottom: 7,
+              }}
+            >
+
+
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: 'yello',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text>dd</Text>
+              </View>
+
+
+
+
+              <View
+                style={{
+                  flex: 4.5,
+                }}
+              >
+                <View
+                  style={{
+                    height: 33,
+                    justifyContent: 'center',
+                    backgroundColor: 'green',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 27,
+                    }}
+                    numberOfLines={1}
+                  >
+                    This is Title
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 27,
+                    justifyContent: 'center',
+                    backgroundColor: 'pink',
+                  }}
+                >
+                  <Text>This is message</Text>
+                </View>
+              </View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              {/* <View
+                style={{
+                  height: 50,
+                  backgroundColor: 'green', // IN EACH LIST, TITLE CONTAINER
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 20,
+                  }}
+                  // adjustsFontSizeToFit
+                  numberOfLines={1}
+                >
+                  {item.title} this is first vote's title it should be long
+                </Text>
+              </View>
+              <View
+                style={{
+                  height: 30,
+                  backgroundColor: 'blue', // IN EACH LIST, CONTENT CONTAINER
+                }}
+              >
+                <View
+                  style={{
+                    // backgroundColor: 'green', // IN CONTENT CONTAINER, TEXT CONTAINER
+                  }}
+                >
+                  <Text style={{}}>{item.text}</Text>
+                </View>
+                <View
+                  style={{
+                    // backgroundColor: 'green', // IN CONTENT CONTAINER, TOTAL VOTE CONTAINER
+                  }}
+                >
+                  <Text style={{}}>{item.options[0].message}</Text>
+                </View>
+              </View> */}
+            </View>
+          );
+        }}
       />
     );
   }
@@ -126,8 +255,8 @@ export default class VotesScreen extends Component {
         style={styles.container}
       >
         <View
-          style={styles.contentContainer}
-        >
+          style={{ ...styles.contentContainer, flex: 2 }}
+          >
           <Text>OPEN VOTES</Text>
           {
             hasOpenVotes &&
@@ -143,6 +272,7 @@ export default class VotesScreen extends Component {
             this.renderClosedVotes(closedVotes)
           }
         </View>
+
         <View
           style={{
             ...styles.contentContainer,
@@ -158,7 +288,7 @@ export default class VotesScreen extends Component {
               paddingBottom: 30,
             }}
           >
-            <StyledButton
+            <CircleButton
               onPress={this.handleOnPress}
               title="+"
 
