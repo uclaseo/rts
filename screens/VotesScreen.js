@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 // import { ExpoConfigView } from '@expo/samples';
 import {
+  AsyncStorage,
   StyleSheet,
   View,
   Text,
@@ -45,13 +46,22 @@ export default class VotesScreen extends Component {
   };
 
   state = {
+    user: {},
     votes: [],
     vote: {},
     isModalOpen: false,
   };
 
   async componentDidMount() {
-    await this.fetchAllVotes();
+    try {
+      const user = JSON.parse(await AsyncStorage.getItem('user'));
+      this.setState({
+        user,
+      });
+      await this.fetchAllVotes();
+    } catch (error) {
+      return console.error('VotesScreen - componentDidMount error: ', error);
+    }
   }
 
   fetchAllVotes = async () => {
@@ -225,20 +235,78 @@ export default class VotesScreen extends Component {
       vote,
       isModalOpen,
     } = this.state;
+    const buttonColors = [
+      Colors.primaryColor,
+      Colors.secondaryColor,
+      Colors.tertiaryColor,
+      Colors.primaryColor,
+      Colors.secondaryColor,
+      Colors.tertiaryColor,
+    ];
     return (
       <Modal
         animationType="fade"
-        // transparent
         visible={isModalOpen}
         onRequestClose={this.toggleModal}
-        presentationStyle="formSheet"
       >
         <View
           style={{
-            backgroundColor: 'blue',
+            flex: 2,
           }}
         >
-          <Text>haha</Text>
+          <Text
+            style={{
+              fontSize: 35,
+              fontWeight: '500',
+            }}
+          >
+            {vote.title}
+          </Text>
+          <Text
+            style={{
+              fontSize: 27,
+            }}
+          >
+            {vote.text}
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 5,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}
+        >
+          {
+            vote.options.map((option, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    // alignSelf: 'stertch',
+                    width: 200,
+                    marginBottom: 25,
+                    height: 70,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 5,
+                    backgroundColor: buttonColors[index],
+                  }}
+                >
+                  <Badge
+                    value={option.count}
+                    status="success"
+                    containerStyle={{
+                      position: 'absolute',
+                      top: -10,
+                      left: -10,
+                    }}
+                  />
+                  <Text>{option.message}</Text>
+                </View>
+              );
+            })
+          }
         </View>
 
       </Modal>
@@ -255,12 +323,13 @@ export default class VotesScreen extends Component {
 
   render() {
     const {
+      user,
       votes,
       isModalOpen,
     } = this.state;
 
     const hasVotes = votes.length > 0;
-
+    const isCoach = user && user.role && user.role.isCoach;
     return (
       <View
         style={styles.container}
@@ -273,10 +342,15 @@ export default class VotesScreen extends Component {
             hasVotes
             && this.renderVotes(votes)
           }
-          <CircleButton
-            onPress={this.handleOnPressAdd}
-            title="+"
-          />
+          {
+            isCoach
+            && (
+              <CircleButton
+                onPress={this.handleOnPressAdd}
+                title="+"
+              />
+            )
+          }
         </View>
 
         {
