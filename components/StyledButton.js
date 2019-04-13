@@ -46,6 +46,8 @@ export const StyledButton = (props) => {
 
 export const CircleButton = (props) => {
   const size = props.size ? props.size : 60;
+  const style = props.style;
+  const children = props.children;
   return (
     <View
       style={{
@@ -56,9 +58,10 @@ export const CircleButton = (props) => {
         overflow: 'hidden',
         bottom: 20,
         right: 20,
-        shadowOffset: { width: 10, height: 10, },
+        shadowOffset: { width: 10, height: 10 },
         shadowColor: 'black',
         shadowOpacity: 1.0,
+        ...style,
       }}
     >
       <Button
@@ -83,6 +86,7 @@ export const CircleButton = (props) => {
           ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
           : undefined
         }
+        icon={children}
       />
     </View>
   );
