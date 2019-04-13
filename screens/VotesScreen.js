@@ -56,7 +56,9 @@ export default class VotesScreen extends Component {
     newVote: {
       titleText: '',
       descriptionText: '',
-      options: [],
+      options: [
+        { message: '', count: 0 },
+      ],
     },
   };
 
@@ -105,37 +107,6 @@ export default class VotesScreen extends Component {
 
   handleOnPressAddVote = async () => {
     try {
-      // const voteOption = {
-      //   id: 1,
-      //   title: 'First Vote',
-      //   text: 'this is the first vote',
-      //   options: [
-      //     { message: 'yes', count: 1 },
-      //     { message: 'no', count: 3 },
-      //     { message: 'I dont know', count: 5 },
-      //   ],
-      //   isOpen: false,
-      //   voteCount: 9,
-      // };
-      // const voteAnother = {
-      //   id: 1,
-      //   title: 'Second Vote regarding the 대회',
-      //   text: 'This is another test second vote so please votesssssSSsssㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ',
-      //   options: [
-      //     { message: 'yes', count: 0 },
-      //     { message: 'no', count: 0 },
-      //     { message: 'I dont know', count: 0 },
-      //   ],
-      //   isOpen: true,
-      //   voteCount: 0,
-      // };
-      // const { success } = await callApi('post', '/vote/create', voteOption);
-      // await callApi('post', '/vote/create', voteAnother);
-      // if (!success) {
-      //   // DO SOME LOGIC HERE
-      // }
-      // await this.fetchAllVotes();
-
       this.setState({
         isModalOpen: true,
         isAddingVote: true,
@@ -152,14 +123,13 @@ export default class VotesScreen extends Component {
       return {
         newVote: {
           ...state.newVote,
-          options: [...state.newVote.options, ''],
+          options: [...state.newVote.options, { message: '', count: 0 }],
         },
       };
     });
   }
 
   handleOnPressVote = (item) => {
-    console.log('handleOnPressVote', item);
     this.setState({
       vote: item,
     }, () => {
@@ -227,7 +197,7 @@ export default class VotesScreen extends Component {
                       }}
                       numberOfLines={1}
                     >
-                      {item.title}
+                      {item.titleText}
                     </Text>
                   </View>
                   <View
@@ -243,7 +213,7 @@ export default class VotesScreen extends Component {
                       }}
                       numberOfLines={2}
                     >
-                      {item.text}
+                      {item.descriptionText}
                     </Text>
                   </View>
                 </View>
@@ -326,18 +296,6 @@ export default class VotesScreen extends Component {
             {
               options.map((option, index) => {
                 return (
-                  // <TextInput
-                  //   key={index}
-                  //   style={{
-                  //     fontSize: 27,
-                  //     borderColor: 'black',
-                  //     borderWidth: 1,
-                  //   }}
-                  //   onChangeText={text => this.handleInputChangeOption(text, index)}
-                  //   value={option}
-                  //   multiline
-                  //   placeholder="Option"
-                  // />
                   <View
                     key={index}
                     style={{
@@ -356,7 +314,7 @@ export default class VotesScreen extends Component {
                       style={{
                       }}
                       onChangeText={text => this.handleInputChangeOption(text, index)}
-                      value={option.toUpperCase()}
+                      value={option.message.toUpperCase()}
                       multiline
                       placeholder="Option"
                     />
@@ -365,8 +323,14 @@ export default class VotesScreen extends Component {
               })
             }
             <CircleButton
+              onPress={this.handleOnPressAddOption}
               style={{
                 bottom: 100,
+              }}
+              title="+"
+            />
+            <CircleButton
+              style={{
               }}
               onPress={this.handleOnPressSubmit}
             >
@@ -377,10 +341,6 @@ export default class VotesScreen extends Component {
                 color={Colors.tintColor}
               />
             </CircleButton>
-            <CircleButton
-              onPress={this.handleOnPressAddOption}
-              title="+"
-            />
           </View>
 
         </Modal>
@@ -404,14 +364,14 @@ export default class VotesScreen extends Component {
               fontWeight: '500',
             }}
           >
-            {vote.title}
+            {vote.titleText}
           </Text>
           <Text
             style={{
               fontSize: 27,
             }}
           >
-            {vote.text}
+            {vote.descriptionText}
           </Text>
         </View>
         <View
@@ -466,9 +426,6 @@ export default class VotesScreen extends Component {
         },
       };
     });
-    // this.setState({
-    //   [field]: value,
-    // });
   }
 
   handleInputChangeOption = (value, index) => {
@@ -477,7 +434,10 @@ export default class VotesScreen extends Component {
         options: newOptions,
       },
     } = this.state;
-    newOptions[index] = value;
+    newOptions[index] = {
+      message: value,
+      count: 0,
+    };
     this.setState((state) => {
       return {
         newVote: {
@@ -486,17 +446,17 @@ export default class VotesScreen extends Component {
         },
       };
     });
-    // const { options: newOptions } = this.state;
-    // newOptions[index] = value;
-    // this.setState({
-    //   newOptions: {}
-    //   options: newOptions,
-    // });
   }
 
-  handleOnPressSubmit = () => {
+  handleOnPressSubmit = async () => {
     const { newVote } = this.state;
-    console.log('newVote', newVote);
+    newVote.isOpen = true;
+    newVote.voteCount = 0;
+
+    const { success } = await callApi('post', '/vote/create', newVote);
+    if (!success) {
+      // DO SOME LOGIC HERE
+    }
     this.setState({
       isModalOpen: false,
       isAddingVote: false,
@@ -506,6 +466,8 @@ export default class VotesScreen extends Component {
         options: [],
       },
     });
+    await this.fetchAllVotes();
+
   }
 
 
