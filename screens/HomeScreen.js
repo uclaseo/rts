@@ -151,7 +151,7 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        {/* <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
             <Image
               source={
@@ -189,9 +189,10 @@ export default class HomeScreen extends React.Component {
 
           <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
             <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-            <Button title="SignOut" onPress={this.signOutAsync} />
-          </View>
-        </View>
+            </View>
+          </View> */}
+        <MonoText style={{paddingTop: 40}}>여기 뭐 들어가 메인홈 화면에</MonoText>
+        <Button title="SignOut" onPress={this.signOutAsync} />
       </View>
     );
   }

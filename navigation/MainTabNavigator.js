@@ -2,12 +2,19 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
+
+import { Icon } from 'expo';
+
+
+
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import VotesScreen from '../screens/VotesScreen';
 import LessonsScreen from '../screens/LessonsScreen';
 import { withTheme } from 'react-native-elements';
+
+import Colors from '../constants/Colors';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -20,8 +27,8 @@ HomeStack.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? 'ios-home'
+          : 'md-home'
       }
     />
   ),
@@ -41,16 +48,22 @@ LinksStack.navigationOptions = {
   ),
 };
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
+const VotesStack = createStackNavigator({
+  Votes: VotesScreen,
 });
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+VotesStack.navigationOptions = {
+  tabBarLabel: 'Votes', 
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    // <TabBarIcon
+    //   focused={focused}
+    //   name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+    // />
+    <Icon.MaterialCommunityIcons
+      name="vote-outline"
+      size={26}
+      style={{ marginBottom: -3 }}
+      color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
     />
   ),
 };
@@ -69,18 +82,11 @@ LessonsStack.navigationOptions = {
   ),
 };
 
-// export default createBottomTabNavigator({
-//   HomeStack,
-//   LinksStack,
-//   SettingsStack,
-//   LessonsStack,
-// });
-
 export default createMaterialTopTabNavigator(
   {
     HomeStack,
     LinksStack,
-    SettingsStack,
+    VotesStack,
     LessonsStack,
   },
   {
@@ -89,6 +95,9 @@ export default createMaterialTopTabNavigator(
     tabBarOptions: {
       showIcon: true,
       showLabel: false,
+      indicatorStyle: {
+        backgroundColor: Colors.tintColor,
+      },
       style: {
         backgroundColor: 'white',
       },
