@@ -10,6 +10,8 @@ import {
   TouchableHighlight,
   Alert,
   TextInput,
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
 
 import {
@@ -34,11 +36,9 @@ import Colors from '../constants/Colors';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'yellow',
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'white',
   },
 });
 
@@ -64,6 +64,7 @@ export default class VotesScreen extends Component {
         },
       ],
     },
+    isRefreshing: false,
   };
 
   async componentDidMount() {
@@ -522,11 +523,19 @@ export default class VotesScreen extends Component {
     });
   }
 
+  onRefresh = async () => {
+    console.log('onRefresh');
+    this.setState({ isRefreshing: true });
+    await this.fetchAllVotes();
+    this.setState({ isRefreshing: false });
+  }
+
   render() {
     const {
       user,
       votes,
       isModalOpen,
+      isRefreshing,
     } = this.state;
 
     const hasVotes = votes.length > 0;
@@ -534,14 +543,23 @@ export default class VotesScreen extends Component {
     return (
       <View
         style={styles.container}
-      >
+        >
         <View
           style={{ ...styles.contentContainer }}
         >
-          {
-            hasVotes
-            && this.renderVotes(votes)
-          }
+          <ScrollView
+            refreshControl={(
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={this.onRefresh}
+              />
+            )}
+          >
+            {
+              hasVotes
+              && this.renderVotes(votes)
+            }
+          </ScrollView>
           {
             !isCoach
             && (
