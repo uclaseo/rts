@@ -57,7 +57,11 @@ export default class VotesScreen extends Component {
       titleText: '',
       descriptionText: '',
       options: [
-        { message: '', count: 0 },
+        {
+          id: Math.random().toString(36).substr(2, 9),
+          message: '',
+          votedUsers: [],
+        },
       ],
     },
   };
@@ -68,7 +72,7 @@ export default class VotesScreen extends Component {
       this.setState({
         user,
       });
-      await this.fetchAllVotes();
+      return await this.fetchAllVotes();
     } catch (error) {
       return console.error('VotesScreen - componentDidMount error: ', error);
     }
@@ -123,13 +127,17 @@ export default class VotesScreen extends Component {
       return {
         newVote: {
           ...state.newVote,
-          options: [...state.newVote.options, { message: '', count: 0 }],
+          options: [...state.newVote.options, { id: this.generateRandomId(), message: '', votedUsers: [] }],
         },
       };
     });
   }
 
-  handleOnPressVote = (item) => {
+  generateRandomId = () => {
+    return Math.random().toString(36).substr(2, 9);
+  }
+
+  handleOnPressVoteListItem = (item) => {
     this.setState({
       vote: item,
     }, () => {
@@ -138,7 +146,6 @@ export default class VotesScreen extends Component {
   }
 
   renderVotes = (votes) => {
-
     return (
       <FlatList
         data={votes}
@@ -146,13 +153,13 @@ export default class VotesScreen extends Component {
         renderItem={({ item }) => {
           return (
             <TouchableHighlight
-              onPress={() => this.handleOnPressVote(item)}
+              onPress={() => this.handleOnPressVoteListItem(item)}
               underlayColor="rgba(47, 149, 220, 0.2)"
             >
               <View
                 style={{
                   height: 60,
-                  flexDirection: 'row',
+                  flexDirection: 'row',  
                   marginTop: 7,
                   marginBottom: 7,
                   paddingRight: 30,
@@ -225,6 +232,39 @@ export default class VotesScreen extends Component {
     );
   }
 
+  vote = async (voteId, voteOption) => {
+    try {
+      const {
+        user,
+        vote,
+      } = this.state;
+
+      const hasUser = voteOption.votedUsers.find((votedUser) => {
+        return votedUser._id === user._id;
+      });
+      if (hasUser) {
+        return Alert.alert('You already voted');
+      }
+
+      const option = {
+        user,
+        voteId,
+        voteOption,
+      };
+      const response = await callApi('put', '/vote/openVotes', option);
+      const { success, openVotes } = response;
+      if (!success) {
+        // DO THE LOGIC IF NOT SUCCESS
+      }
+      this.setState({
+        vote: response.vote,
+      });
+      await this.fetchAllVotes();
+    } catch (error) {
+      return console.error('VotesScreen - vote error: ', error);
+    }
+  }
+
   renderModal = () => {
     const {
       vote,
@@ -277,14 +317,6 @@ export default class VotesScreen extends Component {
               multiline
               placeholder="Description"
             />
-            <Input
-              placeholder="Title"
-              shake
-            />
-            <Input
-              placeholder="Description"
-            />
-
           </View>
           <View
             style={{
@@ -314,7 +346,7 @@ export default class VotesScreen extends Component {
                       style={{
                       }}
                       onChangeText={text => this.handleInputChangeOption(text, index)}
-                      value={option.message.toUpperCase()}
+                      value={option.message}
                       multiline
                       placeholder="Option"
                     />
@@ -384,21 +416,26 @@ export default class VotesScreen extends Component {
           {
             vote.options.map((option, index) => {
               return (
+
                 <View
                   key={index}
                   style={{
                     // alignSelf: 'stertch',
-                    width: 300,
+                    // width: 300,
                     marginBottom: 25,
-                    height: 70,
+                    // height: 70,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    borderRadius: 5,
+                    borderRadius: 50,
                     backgroundColor: buttonColors[index],
                   }}
                 >
+                  <StyledButton
+                    title={option.message}
+                    onPress={() => this.vote(vote._id, option)}
+                  />
                   <Badge
-                    value={option.count}
+                    value={option.votedUsers.length}
                     status="success"
                     containerStyle={{
                       position: 'absolute',
@@ -406,7 +443,7 @@ export default class VotesScreen extends Component {
                       left: -10,
                     }}
                   />
-                  <Text>{option.message.toUpperCase()}</Text>
+                  {/* <Text>{option.message.toUpperCase()}</Text> */}
                 </View>
               );
             })
@@ -435,8 +472,9 @@ export default class VotesScreen extends Component {
       },
     } = this.state;
     newOptions[index] = {
+      ...newOptions[index],
       message: value,
-      count: 0,
+      votedUsers: [],
     };
     this.setState((state) => {
       return {
@@ -467,7 +505,6 @@ export default class VotesScreen extends Component {
       },
     });
     await this.fetchAllVotes();
-
   }
 
 
