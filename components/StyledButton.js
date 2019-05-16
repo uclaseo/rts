@@ -4,6 +4,7 @@ import {
   View,
   Platform,
   TouchableNativeFeedback,
+  TouchableWithoutFeedback,
   TouchableOpacity,
 } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -19,27 +20,69 @@ export const StyledButton = (props) => {
         overflow: 'hidden',
       }}
     >
-      <Button
-        buttonStyle={{
-          width: 150,
-          borderRadius: 50,
-        }}
-        containaerStyle={{
-        }}
-        titleStyle={{
-          fontSize: 14,
-          fontWeight: '500',
-          fontFamily: 'roboto',
-          color: Colors.tintColor,
-        }}
-        type="outline"
-        {...props}
-        background={
-        Platform.OS !== 'ios'
-          ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
-          : undefined
-        }
-      />
+      <TouchableWithoutFeedback
+        onLongPress={props.onLongPress}
+      >
+        <Button
+          buttonStyle={{
+            width: 150,
+            borderRadius: 50,
+          }}
+          containaerStyle={{
+          }}
+          titleStyle={{
+            fontSize: 14,
+            fontWeight: '500',
+            fontFamily: 'roboto',
+            color: Colors.tintColor,
+          }}
+          type="outline"
+          {...props}
+          background={
+          Platform.OS !== 'ios'
+            ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
+            : undefined
+          }
+        />
+      </TouchableWithoutFeedback>
+    </View>
+  );
+};
+
+export const IOSBack = (props) => {
+  return (
+    <View
+      style={{
+        width: 150,
+        borderRadius: 50,
+        overflow: 'hidden',
+      }}
+    >
+      <TouchableWithoutFeedback
+        onLongPress={props.onLongPress}
+      >
+        <Button
+          buttonStyle={{
+            width: 150,
+            borderRadius: 50,
+          }}
+          containaerStyle={{
+          }}
+          titleStyle={{
+            fontSize: 14,
+            fontWeight: '500',
+            fontFamily: 'roboto',
+            color: Colors.tintColor,
+          }}
+          type="outline"
+          {...props}
+          background={
+          Platform.OS !== 'ios'
+            ? TouchableNativeFeedback.Ripple(Colors.tintColor, false)
+            : undefined
+          }
+        />
+      </TouchableWithoutFeedback>
     </View>
   );
 };

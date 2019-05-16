@@ -26,6 +26,7 @@ import {
 
 import { 
   StyledButton,
+  IOSBack,
   CircleButton,
 } from '../components/StyledButton';
 import callApi from '../utils/Api';
@@ -70,6 +71,7 @@ export default class VotesScreen extends Component {
   async componentDidMount() {
     try {
       const user = JSON.parse(await AsyncStorage.getItem('user'));
+      console.log('user from async', user);
       this.setState({
         user,
       });
@@ -239,7 +241,7 @@ export default class VotesScreen extends Component {
         user,
         vote,
       } = this.state;
-
+      console.log('user', user);
       const hasUser = voteOption.votedUsers.find((votedUser) => {
         return votedUser._id === user._id;
       });
@@ -434,6 +436,7 @@ export default class VotesScreen extends Component {
                   <StyledButton
                     title={option.message}
                     onPress={() => this.vote(vote._id, option)}
+                    onLongPress={this.onLongPress}
                   />
                   <Badge
                     value={option.votedUsers.length}
@@ -450,9 +453,15 @@ export default class VotesScreen extends Component {
             })
           }
         </View>
-
+        <IOSBack
+          title='back'
+          onPress={this.toggleModal}
+        />
       </Modal>
     );
+  }
+  onLongPress = () => {
+    console.log('onLongPress');
   }
 
   handleInputChange = (field, value) => {
@@ -543,7 +552,7 @@ export default class VotesScreen extends Component {
     return (
       <View
         style={styles.container}
-        >
+      >
         <View
           style={{ ...styles.contentContainer }}
         >

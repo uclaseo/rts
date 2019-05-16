@@ -41,7 +41,10 @@ class SignInScreen extends Component {
         await AsyncStorage.setItem('userToken', token);
         const user = await this.fetchUser(email);
         if (user) {
+          console.log('userrrrrrrrrrrrrr', user);
           await AsyncStorage.setItem('user', JSON.stringify(user));
+          const wtf = await AsyncStorage.getItem('user');
+          console.log ('wtf', wtf);
           return this.props.navigation.navigate('Main');
         }
         AsyncStorage.setItem(
